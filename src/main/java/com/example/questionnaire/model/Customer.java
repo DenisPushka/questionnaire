@@ -1,0 +1,38 @@
+package com.example.questionnaire.model;
+
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@Data
+public class Customer {
+    @Column(name = "created_date", nullable = false, updatable = false)
+    @CreatedDate
+    private long createdDate;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private Role role;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Questionnaire> questionnaires = new ArrayList<>();
+
+    private Integer points;
+
+    private String email;
+
+//    public User(String email){
+//        this.email = email;
+//    }
+}
