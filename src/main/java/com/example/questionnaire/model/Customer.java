@@ -21,6 +21,8 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String name;
+
     private Role role;
 
     @EqualsAndHashCode.Exclude
@@ -32,7 +34,10 @@ public class Customer {
 
     private String email;
 
-//    public User(String email){
-//        this.email = email;
-//    }
+    public Customer(String name, String email, Role role){
+        this.email = email;
+        this.name = name;
+        this.role = role;
+        points = 0;
+    }
 }

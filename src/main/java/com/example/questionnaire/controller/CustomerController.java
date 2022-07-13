@@ -1,43 +1,54 @@
 package com.example.questionnaire.controller;
 
 import com.example.questionnaire.model.Customer;
+import com.example.questionnaire.model.Questionnaire;
 import com.example.questionnaire.service.CustomerService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.questionnaire.model.Role.ADMIN;
-
-@Controller
+@RestController
 @AllArgsConstructor
 @RequestMapping("/customer")
 public class CustomerController {
+
     private final CustomerService customerService;
 
+    @PostMapping("/updatePoint/{id}")
+    public ResponseEntity<Customer> updatePoint(@PathVariable Long id, @RequestBody Integer points) {
+        return customerService.updatePoints(id, points);
+    }
+
     @GetMapping
-    public List<Customer> getCustomers(Customer customer) {
-        return customer.getRole().equals(ADMIN) ? customerService.readUsers() : new ArrayList<>();
+    public ResponseEntity<List<Customer>> getCustomers() {
+//        return customer.getRole().equals(ADMIN) ? customerService.readUsers() : new ArrayList<>();
+        return customerService.readCustomer();
+    }
+
+    @GetMapping("/{id}")
+    public Customer getCustomers(@PathVariable Long id) {
+        return customerService.findFirstById(id);
     }
 
     @PostMapping
-    public ResponseEntity addCustomer(Customer customer){
-        return customerService.saveUser(customer);
+    public Customer addCustomer(@RequestBody Customer customer) {
+        return customerService.saveCustomer(customer);
     }
 
-    @PostMapping("/addQuestionnaire")
-    public ResponseEntity addQuestionnaire(Customer customer){
-        return customerService.addQuestionnaire(customer);
+    @PostMapping("/addQuestionnaire/{id}")
+    public Customer addQuestionnaire(@PathVariable Long id, @RequestBody Questionnaire questionnaire) {
+        return customerService.addQuestionnaire(id, questionnaire);
     }
 
-    @GetMapping("/ratingCustomer")
-    public Integer ratingCustomer(Customer customer){
-        return customerService.ratingUser(customer);
+    @GetMapping("/ratingCustomer/{id}")
+    public Integer ratingCustomer(@PathVariable Long id) {
+        return customerService.ratingCustomer(id);
     }
 
+    @DeleteMapping("/{id}")
+    public boolean deleteCustomer(@PathVariable Long id) {
+        return customerService.deleteCustomer(id);
+    }
 }

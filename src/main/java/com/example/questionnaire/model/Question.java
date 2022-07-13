@@ -17,6 +17,8 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String question;
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @ElementCollection
