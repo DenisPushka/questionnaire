@@ -29,11 +29,11 @@ class Quest extends Component {
     async componentDidMount() {
         const q = await (await fetch(`/questionnaire/${this.props.match.params.id}`)).json()
         this.setState({questionnaire: q})
-        console.log(q)
     }
 
 
     render() {
+        console.log(this.state.questionnaire)
         const questionList = this.state.questionnaire.questions.map(q => {
 
             return <ul>{q.question}
@@ -54,6 +54,8 @@ class Quest extends Component {
         })
 
         return <div className={"App"}>
+            <h2>{this.state.questionnaire.title}</h2>
+            <br/>
             {questionList}
             {/*<Col sm={10}>*/}
             {/*    <Form.Check*/}

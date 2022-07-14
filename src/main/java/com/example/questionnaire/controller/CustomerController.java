@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("/customer")
 public class CustomerController {
-
     private final CustomerService customerService;
 
     @PostMapping("/updatePoint/{id}")
