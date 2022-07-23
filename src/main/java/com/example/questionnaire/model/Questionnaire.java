@@ -25,5 +25,4 @@ public class Questionnaire {
     @ToString.Exclude
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Question> questions = new ArrayList<>();
-
 }
