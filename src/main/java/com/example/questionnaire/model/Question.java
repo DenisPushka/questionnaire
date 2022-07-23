@@ -21,8 +21,8 @@ public class Question {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ElementCollection
-    private List<String> answers = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Answers> answers = new ArrayList<>();
 
     private String trueAnswer;
 }

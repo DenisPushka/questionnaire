@@ -1,44 +1,57 @@
 package com.example.questionnaire.controller;
 
-import com.example.questionnaire.model.Customer;
-import com.example.questionnaire.model.Questionnaire;
+import com.example.questionnaire.dto.CustomerCreationDTO;
+import com.example.questionnaire.dto.CustomerDTO;
+import com.example.questionnaire.mapper.Mapper;
+import com.example.questionnaire.model.CustomerSelectAnswers;
+import com.example.questionnaire.repository.CustomerRepository;
 import com.example.questionnaire.service.CustomerService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/customer")
 public class CustomerController {
     private final CustomerService customerService;
+    private final CustomerRepository customerRepository;
+    private final Mapper mapper;
 
     @PostMapping("/updatePoint/{id}")
-    public ResponseEntity<Customer> updatePoint(@PathVariable Long id, @RequestBody Integer points) {
-        return customerService.updatePoints(id, points);
+    public ResponseEntity<CustomerDTO> updatePoint(@PathVariable Long id, @RequestBody Integer points) {
+        var dto = mapper.toDTO(customerService.updatePoints(id, points));
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getCustomers() {
-//        return customer.getRole().equals(ADMIN) ? customerService.readUsers() : new ArrayList<>();
-        return customerService.readCustomer();
-    }
+    public ResponseEntity<List<CustomerDTO>> getCustomers() {
+        var customersDTO = customerService.readCustomer()
+                .stream()
+                .map(mapper::toDTO)
+                .collect(toList());
 
-    @GetMapping("/{id}")
-    public Customer getCustomers(@PathVariable Long id) {
-        return customerService.findFirstById(id);
+        return new ResponseEntity<>(customersDTO, HttpStatus.OK);
     }
 
     @PostMapping
-    public Customer addCustomer(@RequestBody Customer customer) {
-        return customerService.saveCustomer(customer);
+    public ResponseEntity<CustomerDTO> addCustomer(@RequestBody CustomerCreationDTO customerDTO) {
+        var customer = mapper.createCustomer(customerDTO);
+        if (customerRepository.existsCustomerByName(customer.getName()))
+            return new ResponseEntity("Пользователь с таким именем уже существует", HttpStatus.NOT_ACCEPTABLE);
+        var dto = mapper.toDTO(customerService.saveCustomer(customer));
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
-    @PostMapping("/addQuestionnaire/{id}")
-    public Customer addQuestionnaire(@PathVariable Long id, @RequestBody Questionnaire questionnaire) {
-        return customerService.addQuestionnaire(id, questionnaire);
+    @PostMapping("/addAnswer/{id}")
+    public ResponseEntity<CustomerDTO> addAnswer(@PathVariable Long id, @RequestBody CustomerSelectAnswers customerSelectAnswers) {
+        var dto = mapper.toDTO(customerService.addAnswer(id, customerSelectAnswers));
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @GetMapping("/ratingCustomer/{id}")

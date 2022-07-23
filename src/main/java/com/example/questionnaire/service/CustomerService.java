@@ -1,21 +1,20 @@
 package com.example.questionnaire.service;
 
 import com.example.questionnaire.model.Customer;
-import com.example.questionnaire.model.Questionnaire;
+import com.example.questionnaire.model.CustomerSelectAnswers;
 import com.example.questionnaire.repository.CustomerRepository;
+import com.example.questionnaire.repository.CustomerSelectAnswerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final CustomerSelectAnswerRepository customerSAnRepository;
 
     public Customer saveCustomer(Customer customer) {
         return customer.getId() == null && !customerRepository.existsCustomerByEmail(customer.getEmail()) ?
@@ -23,31 +22,29 @@ public class CustomerService {
                 customerRepository.findByEmail(customer.getEmail());
     }
 
-    public Customer addQuestionnaire(Long id, Questionnaire questionnaire) {
-        var customer = findFirstById(id);
-        customer.getQuestionnaires().add(questionnaire);
+    public Customer addAnswer(Long id, CustomerSelectAnswers customerSelectAnswers) {
+        if (customerRepository.findById(id).isPresent()) throw new NullPointerException("нет пользователя!");
+        var customer = customerRepository.findById(id).get();
+        customerSAnRepository.save(customerSelectAnswers);
+        customer.getAnswers().add(customerSelectAnswers);
         return saveCustomer(customer);
     }
 
-    public ResponseEntity<List<Customer>> readCustomer() {
+    public List<Customer> readCustomer() {
         var sort = Sort.by("Points").ascending();
-        var customers = new ArrayList<>(customerRepository.findAll(sort));
-
-        return new ResponseEntity<>(customers, HttpStatus.OK);
-    }
-
-    public Customer findFirstById(Long id) {
-        return customerRepository.findFirstById(id);
+        return customerRepository.findAll(sort);
     }
 
     public Integer ratingCustomer(Long id) {
-        return findFirstById(id).getPoints();
+        if (customerRepository.findById(id).isPresent()) throw new NullPointerException("нет пользователя!");
+        return customerRepository.findById(id).get().getPoints();
     }
 
-    public ResponseEntity<Customer> updatePoints(Long id, Integer points) {
-        var customer = findFirstById(id);
+    public Customer updatePoints(Long id, Integer points) {
+        if (customerRepository.findById(id).isPresent()) throw new NullPointerException("нет пользователя!");
+        var customer = customerRepository.findById(id).get();
         customer.setPoints(points);
-        return new ResponseEntity<>(customerRepository.save(customer), HttpStatus.OK);
+        return customerRepository.save(customer);
     }
 
     public boolean deleteCustomer(Long id) {

@@ -28,7 +28,7 @@ public class Customer {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Questionnaire> questionnaires = new ArrayList<>();
+    private List<CustomerSelectAnswers> answers = new ArrayList<>();
 
     private Integer points;
 

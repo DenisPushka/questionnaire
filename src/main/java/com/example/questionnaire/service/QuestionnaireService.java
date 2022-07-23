@@ -5,8 +5,6 @@ import com.example.questionnaire.model.Questionnaire;
 import com.example.questionnaire.repository.QuestionRepository;
 import com.example.questionnaire.repository.QuestionnaireRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,27 +17,44 @@ public class QuestionnaireService {
     private final QuestionnaireRepository questionnaireRepository;
     private final QuestionRepository questionRepository;
 
-    public ResponseEntity saveQuestionnaire(Questionnaire questionnaire) {
-        return ResponseEntity.ok(questionnaireRepository.save(questionnaire));
+    public Questionnaire saveQuestionnaire(Questionnaire questionnaire) {
+        return questionnaireRepository.save(questionnaire);
     }
 
-    public ResponseEntity<Questionnaire> findQuestionnaireById(Long id) {
-        return new ResponseEntity<>(questionnaireRepository.findFirstById(id), HttpStatus.OK);
+    public Questionnaire findQuestionnaireById(Long id) {
+        if (questionnaireRepository.findById(id).isPresent()) throw new NullPointerException("нет анкеты!");
+        return questionnaireRepository.findById(id).get();
     }
 
-    public ResponseEntity addQuestion(Long id, Question question) {
-        if (question.getAnswers().size() < 2)
-            return new ResponseEntity<>("Должно быть больше ответов", HttpStatus.NOT_ACCEPTABLE);
-        if (!question.getAnswers().contains(question.getTrueAnswer()))
-            return new ResponseEntity<>("Нет правильного ответа", HttpStatus.NOT_ACCEPTABLE);
-
+    public Questionnaire addQuestion(Long id, Question question) {
         question = questionRepository.save(question);
         var questionnaire = findQuestionnaireById(id);
-        Objects.requireNonNull(questionnaire.getBody()).getQuestions().add(question);
-        return saveQuestionnaire(questionnaire.getBody());
+        Objects.requireNonNull(questionnaire).getQuestions().add(question);
+        return saveQuestionnaire(questionnaire);
     }
 
-    public ResponseEntity<List<Questionnaire>> allQuestionnaires() {
-        return new ResponseEntity<>(new ArrayList<>(questionnaireRepository.findAll()), HttpStatus.OK);
+    public List<Questionnaire> allQuestionnaires() {
+        return questionnaireRepository.findAll();
+    }
+
+    public boolean deleteQuestionnaire(Long id) {
+        var questionnaire = findQuestionnaireById(id);
+        for (var q : questionnaire.getQuestions()) {
+            q.setAnswers(new ArrayList<>());
+            questionRepository.deleteById(q.getId());
+        }
+
+        questionnaire.setQuestions(new ArrayList<>());
+        questionnaireRepository.save(questionnaire);
+//        var customer = customerRepository.findFirstById(10L);
+//        customer.setQuestionnaires(new ArrayList<>());
+//        customerRepository.save(customer);
+        questionnaireRepository.deleteById(id);
+        return true;
+    }
+
+    public boolean deleteQuestion(Long id) {
+        questionRepository.deleteById(id);
+        return true;
     }
 }
