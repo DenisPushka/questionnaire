@@ -41,16 +41,20 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<CustomerDTO> addCustomer(@RequestBody CustomerCreationDTO customerDTO) {
-        var customer = mapper.createCustomer(customerDTO);
-        if (customerRepository.existsCustomerByName(customer.getName()))
+        if (customerRepository.existsCustomerByName(customerDTO.getName()))
             return new ResponseEntity("Пользователь с таким именем уже существует", HttpStatus.NOT_ACCEPTABLE);
+        var customer = mapper.createCustomer(customerDTO);
         var dto = mapper.toDTO(customerService.saveCustomer(customer));
+
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
-    @PostMapping("/addAnswer/{id}")
-    public ResponseEntity<CustomerDTO> addAnswer(@PathVariable Long id, @RequestBody CustomerSelectAnswers customerSelectAnswers) {
-        var dto = mapper.toDTO(customerService.addAnswer(id, customerSelectAnswers));
+    @PostMapping("/addAnswer")
+    public ResponseEntity<CustomerDTO> addAnswer(@RequestBody CustomerSelectAnswers customerSelectAnswers) {
+        if (customerRepository.findById(customerSelectAnswers.getId()).isEmpty())
+            return new ResponseEntity("Нет пользователя!", HttpStatus.NOT_ACCEPTABLE);
+        var dto = mapper.toDTO(customerService.addAnswer(customerSelectAnswers));
+
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 

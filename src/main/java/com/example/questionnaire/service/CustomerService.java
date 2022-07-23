@@ -22,9 +22,8 @@ public class CustomerService {
                 customerRepository.findByEmail(customer.getEmail());
     }
 
-    public Customer addAnswer(Long id, CustomerSelectAnswers customerSelectAnswers) {
-        if (customerRepository.findById(id).isPresent()) throw new NullPointerException("нет пользователя!");
-        var customer = customerRepository.findById(id).get();
+    public Customer addAnswer(CustomerSelectAnswers customerSelectAnswers) {
+        var customer = customerRepository.findById(customerSelectAnswers.getId()).get();
         customerSAnRepository.save(customerSelectAnswers);
         customer.getAnswers().add(customerSelectAnswers);
         return saveCustomer(customer);

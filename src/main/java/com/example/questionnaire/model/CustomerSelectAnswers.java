@@ -16,8 +16,8 @@ public class CustomerSelectAnswers {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    public Long idCustomer;
-    public Long idQuestionnaire;
-    public Long idQuestion;
-    public Long idAnswer;
+    private Long idCustomer;
+    private Long idQuestionnaire;
+    private Long idQuestion;
+    private Long idAnswer;
 }

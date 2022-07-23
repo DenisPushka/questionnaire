@@ -13,6 +13,7 @@ public class Mapper {
 
     public CustomerDTO toDTO(Customer customer){
         var dto = new CustomerDTO();
+        dto.setId(customer.getId());
         dto.setName(customer.getName());
         dto.setPoints(customer.getPoints());
         dto.setRole(customer.getRole());
@@ -22,6 +23,7 @@ public class Mapper {
 
     public Customer toCustomer(CustomerDTO dto){
         var customer = new Customer();
+        customer.setId(dto.getId());
         customer.setName(dto.getName());
         customer.setPoints(dto.getPoints());
         customer.setAnswers(dto.getCustomerSelectAnswers());
